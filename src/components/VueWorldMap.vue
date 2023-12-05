@@ -1375,16 +1375,16 @@ const colorActiveCountries = () => {
 //   if (tooltip) tooltip.remove()
 // }
 
-// const handleMouseOver = (event: MouseEvent) => {
-//   // Apply hover styles
-//   if (event.target instanceof HTMLElement)
-//     event.target.style.transform = 'scale(1.02) translate(-5px, -5px)'
-// }
+const handleMouseOver = (event: MouseEvent) => {
+  // Apply hover styles
+  if (event.target instanceof HTMLElement)
+    event.target.style.transform = 'scale(1.02) translate(-5px, -5px)'
+}
 
-// const handleMouseOut = (event: MouseEvent) => {
-//   // Remove hover styles
-//   if (event.target instanceof HTMLElement) event.target.style.transform = 'none'
-// }
+const handleMouseOut = (event: MouseEvent) => {
+  // Remove hover styles
+  if (event.target instanceof HTMLElement) event.target.style.transform = 'none'
+}
 
 onMounted(() => {
   document.documentElement.style.setProperty('--passive-color', passiveColor.value || '#F5F5F5')
