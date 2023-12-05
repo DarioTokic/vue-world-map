@@ -3,11 +3,11 @@ import VueWorldMap from './components/VueWorldMap.vue'
 
 const countryData = [
   {
-    id: 'US',
+    id: 'United States',
     value: 7323
   },
   {
-    id: 'GB',
+    id: 'Afghanistan',
     value: 1712
   },
   {
@@ -33,7 +33,7 @@ const activeColor = '#2196f3'
 </script>
 
 <template>
-  <VueWorldMap :coutryData="countryData" :passiveColor="passiveColor" :activeColor="activeColor" />
+  <VueWorldMap :countryData="countryData" :passiveColor="passiveColor" :activeColor="activeColor" />
 </template>
 
 <style scoped></style>

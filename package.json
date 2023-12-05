@@ -1,6 +1,6 @@
 {
   "name": "vue3-world-heat-map",
-  "version": "0.0.9",
+  "version": "0.1.2",
   "type": "module",
   "exports": {
     ".": "./dist/index.js",

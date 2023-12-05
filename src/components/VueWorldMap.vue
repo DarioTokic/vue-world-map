@@ -4,8 +4,8 @@ import { ref, onMounted, computed, type PropType, inject } from 'vue'
 interface Country {
   id: string
   value: number
-  percentage: number
-  opacity: number
+  percentage?: number
+  opacity?: number
 }
 
 // props
@@ -1261,8 +1261,8 @@ const paths = ref([
 ])
 
 const data = inject('countryData')
-const passiveColorInject = inject('passiveColor', '#F5F5F5')
-const activeColorInject = inject('activeColor', '#2196f3')
+const passiveColorInject = inject('passiveColor')
+const activeColorInject = inject('activeColor')
 
 const countryVal = data ?? props.countryData
 const passiveColorVal = passiveColorInject ?? props.passiveColor
@@ -1290,23 +1290,26 @@ const addPercentages = () => {
 }
 
 const addOpacity = () => {
-  const maxPercentage = Math.max(...countriesData.value.map((country) => country.percentage))
-  const minPercentage = Math.min(...countriesData.value.map((country) => country.percentage))
+  const maxPercentage = Math.max(...countriesData.value.map((country) => country.percentage || 0))
+  const minPercentage = Math.min(...countriesData.value.map((country) => country.percentage || 0))
 
   const percentageRange = maxPercentage - minPercentage
 
   // Avoid division by zero
-  const scalingFactor = percentageRange !== 0 ? 1000 / percentageRange : 1
+  const scalingFactor = percentageRange > 0 ? 500 / percentageRange : 10
 
   countriesData.value.forEach((country) => {
-    country.opacity = (country.percentage - minPercentage) * scalingFactor
+    if (country.percentage !== undefined) {
+      country.opacity = (country.percentage - minPercentage) * scalingFactor + 10
+      console.log(country.opacity)
+    }
   })
 }
 
 const colorActiveCountries = () => {
   countriesData.value.forEach((country) => {
     const { id } = country
-    const countryPath = paths.value.find((country) => country.id === id)
+    const countryPath = paths.value.find((country) => country.id === id || country.title === id)
     if (countryPath) {
       let { class: countryClass } = countryPath
       countryClass += ' active'
@@ -1392,8 +1395,6 @@ onMounted(() => {
   addOpacity()
   colorActiveCountries()
   //   addTooltips()
-
-  console.log(countryVal)
 })
 </script>
 <template>
@@ -1414,26 +1415,26 @@ onMounted(() => {
         rightLongitude="190.25"
         bottomLatitude="-55.55"
       ></amcharts:ammap>
-
-      <!-- All areas are listed in the line below. You can use this list in your script. -->
-      <!--{id:"AE"},{id:"AF"},{id:"AL"},{id:"AM"},{id:"AO"},{id:"AR"},{id:"AT"},{id:"AU"},{id:"AZ"},{id:"BA"},{id:"BD"},{id:"BE"},{id:"BF"},{id:"BG"},{id:"BI"},{id:"BJ"},{id:"BN"},{id:"BO"},{id:"BR"},{id:"BS"},{id:"BT"},{id:"BW"},{id:"BY"},{id:"BZ"},{id:"CA"},{id:"CD"},{id:"CF"},{id:"CG"},{id:"CH"},{id:"CI"},{id:"CL"},{id:"CM"},{id:"CN"},{id:"CO"},{id:"CR"},{id:"CU"},{id:"CY"},{id:"CZ"},{id:"DE"},{id:"DJ"},{id:"DK"},{id:"DO"},{id:"DZ"},{id:"EC"},{id:"EE"},{id:"EG"},{id:"EH"},{id:"ER"},{id:"ES"},{id:"ET"},{id:"FK"},{id:"FI"},{id:"FJ"},{id:"FR"},{id:"GA"},{id:"GB"},{id:"GE"},{id:"GF"},{id:"GH"},{id:"GL"},{id:"GM"},{id:"GN"},{id:"GQ"},{id:"GR"},{id:"GT"},{id:"GW"},{id:"GY"},{id:"HN"},{id:"HR"},{id:"HT"},{id:"HU"},{id:"ID"},{id:"IE"},{id:"IL"},{id:"IN"},{id:"IQ"},{id:"IR"},{id:"IS"},{id:"IT"},{id:"JM"},{id:"JO"},{id:"JP"},{id:"KE"},{id:"KG"},{id:"KH"},{id:"KP"},{id:"KR"},{id:"XK"},{id:"KW"},{id:"KZ"},{id:"LA"},{id:"LB"},{id:"LK"},{id:"LR"},{id:"LS"},{id:"LT"},{id:"LU"},{id:"LV"},{id:"LY"},{id:"MA"},{id:"MD"},{id:"ME"},{id:"MG"},{id:"MK"},{id:"ML"},{id:"MM"},{id:"MN"},{id:"MR"},{id:"MW"},{id:"MX"},{id:"MY"},{id:"MZ"},{id:"NA"},{id:"NC"},{id:"NE"},{id:"NG"},{id:"NI"},{id:"NL"},{id:"NO"},{id:"NP"},{id:"NZ"},{id:"OM"},{id:"PA"},{id:"PE"},{id:"PG"},{id:"PH"},{id:"PL"},{id:"PK"},{id:"PR"},{id:"PS"},{id:"PT"},{id:"PY"},{id:"QA"},{id:"RO"},{id:"RS"},{id:"RU"},{id:"RW"},{id:"SA"},{id:"SB"},{id:"SD"},{id:"SE"},{id:"SI"},{id:"SJ"},{id:"SK"},{id:"SL"},{id:"SN"},{id:"SO"},{id:"SR"},{id:"SS"},{id:"SV"},{id:"SY"},{id:"SZ"},{id:"TD"},{id:"TF"},{id:"TG"},{id:"TH"},{id:"TJ"},{id:"TL"},{id:"TM"},{id:"TN"},{id:"TR"},{id:"TT"},{id:"TW"},{id:"TZ"},{id:"UA"},{id:"UG"},{id:"US"},{id:"UY"},{id:"UZ"},{id:"VE"},{id:"VN"},{id:"VU"},{id:"YE"},{id:"ZA"},{id:"ZM"},{id:"ZW"}-->
     </defs>
     <g>
-      <path
-        v-for="p in paths"
-        :key="p.id"
-        :id="p.id"
-        :title="p.title"
-        :class="p.class"
-        :d="p.d"
-        :style="{
-          ...p.style,
-          fill: p.class.includes('active') ? activeColor || '#2196f3' : passiveColor || '#F5F5F5',
-          transition: 'transform 0.3s ease'
-        }"
-        @mouseover="handleMouseOver"
-        @mouseout="handleMouseOut"
-      ></path>
+      <template v-for="p in paths" :key="p.id">
+        <path
+          :d="p.d"
+          :style="{
+            fill: passiveColor || '#F5F5F5'
+          }"
+        ></path>
+        <path
+          :id="p.id"
+          :title="p.title"
+          :class="p.class"
+          :d="p.d"
+          :style="{
+            ...p.style,
+            fill: p.class.includes('active') ? activeColor || '#2196f3' : passiveColor || '#F5F5F5'
+          }"
+        ></path>
+      </template>
     </g>
   </svg>
 </template>
